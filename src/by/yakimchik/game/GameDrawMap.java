@@ -16,9 +16,11 @@ public class GameDrawMap {
 	
 	private Bitmap wall;
 	private Bitmap box;
+	private Bitmap robot;
 	
+	private GameView gameView;
 	
-	//coodinates of wall
+	//coordinates of wall
 	private List<Integer> xWallCoordinates = new ArrayList<Integer>();
 	private List<Integer> yWallCoordinates = new ArrayList<Integer>();
 	
@@ -26,13 +28,21 @@ public class GameDrawMap {
 	private List<Integer> xBoxCoordinates = new ArrayList<Integer>();
 	private List<Integer> yBoxCoordinates = new ArrayList<Integer>();
 	
-	public GameDrawMap(XmlPullParser parser, Bitmap wall, Bitmap box){
+	//sprite
+	private List<Integer> xRobotCoordinates = new ArrayList<Integer>();
+	private List<Integer> yRobotCoordinates = new ArrayList<Integer>();
+	
+	private ArrayList<Sprite> sprites = new ArrayList<Sprite>();
+	
+	public GameDrawMap(GameView gameView, XmlPullParser parser, Bitmap wall, Bitmap box, Bitmap robot){
 		this.parser = parser;
 		this.wall = wall;
 		this.box = box;
+		this.robot = robot;
+		this.gameView = gameView;
 	}
 	
-	private void parseXmlFile() throws XmlPullParserException, IOException{
+	public void parseXmlFile() throws XmlPullParserException, IOException{
 		while(parser.getEventType()!=XmlPullParser.END_DOCUMENT){
 			if(parser.getEventType()==XmlPullParser.START_TAG && parser.getName().equals("point")){
 				xWallCoordinates.add(Integer.parseInt(parser.getAttributeValue(0)));
@@ -44,21 +54,22 @@ public class GameDrawMap {
 				yBoxCoordinates.add(Integer.parseInt(parser.getAttributeValue(1)));
 			}
 			
+			if(parser.getEventType()==XmlPullParser.START_TAG && parser.getName().equals("robot")){
+				xRobotCoordinates.add(Integer.parseInt(parser.getAttributeValue(0)));
+				yRobotCoordinates.add(Integer.parseInt(parser.getAttributeValue(1)));
+			}
+			
 			parser.next();
+		}
+		
+		for(int i=0; i<xRobotCoordinates.size(); i++){
+			Sprite s = new Sprite(gameView, robot);
+			s.setPosition(xRobotCoordinates.get(i), yRobotCoordinates.get(i));
+			sprites.add(s);
 		}
 	}
 	
-	public void onDraw(Canvas canvas){
-		try {
-			parseXmlFile();
-		} catch (XmlPullParserException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
+	public void onDraw(Canvas canvas){		
 		for(int i=0; i<xWallCoordinates.size()-1; i++){
 			int x2 = xWallCoordinates.get(i+1);
 			int y2 = yWallCoordinates.get(i+1);
@@ -99,5 +110,10 @@ public class GameDrawMap {
 		for(int i=0; i<xBoxCoordinates.size(); i++){
 			canvas.drawBitmap(box, xBoxCoordinates.get(i), yBoxCoordinates.get(i), null);
 		}
+
+	}
+	
+	public ArrayList<Sprite> getSprites(){
+		return sprites;
 	}
 }

@@ -1,9 +1,11 @@
 package by.yakimchik.game;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
 
 import by.yakimchik.activity.R;
 import android.content.Context;
@@ -25,9 +27,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 	
 	private GameDrawMap gameMap;
 	
-	private Sprite sprite;
-	
 	private XmlPullParser parser;
+	
+	private Canvas canvas;
 	
 	private List<Sprite> sprites = new ArrayList<Sprite>();
 
@@ -40,7 +42,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 		parser = getResources().getXml(R.xml.map1);
 		Bitmap map = BitmapFactory.decodeResource(getResources(), R.drawable.rect);
 		Bitmap box = BitmapFactory.decodeResource(getResources(), R.drawable.box);
-		gameMap = new GameDrawMap(parser, map, box);
+		Bitmap robot = BitmapFactory.decodeResource(getResources(), R.drawable.front);
+		gameMap = new GameDrawMap(this, parser, map, box, robot);
 	}
 
 	@Override
@@ -53,14 +56,18 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 	@Override
 	public void surfaceCreated(SurfaceHolder holder) {
 		// TODO Auto-generated method stub
-		Sprite s = createSprite(R.drawable.right);
-		s.setPosition(5, 5);
-		sprites.add(s);
-		s = createSprite(R.drawable.left);
-		s.setPosition(getWidth()-25, 5); 
-		Coordinates.X = getWidth()-25;
-		Coordinates.Y = 5;
-		sprites.add(s);
+		try {
+			gameMap.parseXmlFile();
+		} catch (XmlPullParserException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		sprites = gameMap.getSprites();
+		
 		gameLoopThread.setRunning(true);
 		gameLoopThread.start();
 	}
@@ -72,23 +79,18 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 	}
 	
 	protected void onDraw(Canvas canvas){
+		this.canvas = canvas;
 		canvas.drawColor(Color.BLACK);
-		//sprite.onDraw(canvas);
-		
-		for(Sprite _sprite: sprites){
-			//_sprite.onDraw(canvas);
-		}
 		
 		gameMap.onDraw(canvas);
+		
+		for(Sprite _sprite: sprites){
+			_sprite.onDraw(canvas);
+		}
 		
 		if(Coordinates.isMatch){
 			stopThread();
 		}
-	}
-	
-	private Sprite createSprite(int resouce){
-		Bitmap bmp = BitmapFactory.decodeResource(getResources(), resouce);
-		return new Sprite(this, bmp);
 	}
 	
 	private void stopThread(){
@@ -104,6 +106,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 				Log.e("Thread", "Error when destroy thread");
 			}
 		}
+	}
+	
+	public void setDraw(){
+		Coordinates.isMove = true;
+		onDraw(canvas);
 	}
 
 }

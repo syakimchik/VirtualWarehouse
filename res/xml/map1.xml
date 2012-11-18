@@ -17,6 +17,7 @@
 	    <box x="150" y="200"/>
 	</boxes>
 	<robots>
-	    <robot x="" y=""/>
+	    <robot x="300" y="210"/>
+	    <robot x="80" y="100"/>
 	</robots>
 </map>

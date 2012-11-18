@@ -49,12 +49,15 @@ public class Sprite {
 	}
 	
 	public synchronized void onDraw(Canvas canvas){
-		move();
-		if(Coordinates.getX()!=x+val)
-			Coordinates.setX(x+val);
-		else
-			Coordinates.isMatch = true;
-		canvas.drawBitmap(bmp, x, 10, null);
+		if(Coordinates.isMove){
+			move();
+			if(Coordinates.getX()!=x+val)
+				Coordinates.setX(x+val);
+			else
+				Coordinates.isMatch = true;
+		}
+			
+		canvas.drawBitmap(bmp, x, y, null);
 	}
 	
 	public boolean isCollition(float x2, float y2){
