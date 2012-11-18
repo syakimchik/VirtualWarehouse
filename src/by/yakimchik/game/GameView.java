@@ -25,8 +25,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 	
 	private GameDrawMap gameMap;
 	
-	private Bitmap bmp;
-	
 	private Sprite sprite;
 	
 	private XmlPullParser parser;
@@ -41,7 +39,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 		gameLoopThread = new GameManager(this);
 		parser = getResources().getXml(R.xml.map1);
 		Bitmap map = BitmapFactory.decodeResource(getResources(), R.drawable.rect);
-		gameMap = new GameDrawMap(parser, map);
+		Bitmap box = BitmapFactory.decodeResource(getResources(), R.drawable.box);
+		gameMap = new GameDrawMap(parser, map, box);
 	}
 
 	@Override
