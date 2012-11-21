@@ -10,7 +10,7 @@
 	    <point x="50" y="70"/>
 	</points>
 	<exit>
-	    <door x="50" y="70"/>
+	    <door x="50" y="30"/>
 	</exit>
 	<boxes>
 	    <box x="300" y="170"/>
@@ -18,6 +18,6 @@
 	</boxes>
 	<robots>
 	    <robot x="300" y="210"/>
-	    <robot x="80" y="100"/>
+	    <robot x="50" y="30"/>
 	</robots>
 </map>

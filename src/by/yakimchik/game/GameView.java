@@ -25,7 +25,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 	
 	private GameManager gameLoopThread;
 	
-	private GameDrawMap gameMap;
+	public GameDrawMap gameMap;
 	
 	private XmlPullParser parser;
 	

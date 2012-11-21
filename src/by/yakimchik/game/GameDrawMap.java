@@ -7,6 +7,8 @@ import java.util.List;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
+import by.yakimchik.data.Point;
+
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 
@@ -20,19 +22,21 @@ public class GameDrawMap {
 	
 	private GameView gameView;
 	
-	//coordinates of wall
-	private List<Integer> xWallCoordinates = new ArrayList<Integer>();
-	private List<Integer> yWallCoordinates = new ArrayList<Integer>();
+	//coordinates of wall	
+	private List<Point> wallCoordinates = new ArrayList<Point>();
 	
 	//coordinates of box
-	private List<Integer> xBoxCoordinates = new ArrayList<Integer>();
-	private List<Integer> yBoxCoordinates = new ArrayList<Integer>();
+	private ArrayList<Point> boxCoordinates = new ArrayList<Point>();
 	
-	//sprite
-	private List<Integer> xRobotCoordinates = new ArrayList<Integer>();
-	private List<Integer> yRobotCoordinates = new ArrayList<Integer>();
+	//coordinates of sprite
+	private ArrayList<Point> robotCoordinates = new ArrayList<Point>();
+	
+	private Point exitCoordinate = null;
 	
 	private ArrayList<Sprite> sprites = new ArrayList<Sprite>();
+	
+	//game 	field coordinates
+	private ArrayList<Point> gameFieldCoordinates = new ArrayList<Point>();
 	
 	public GameDrawMap(GameView gameView, XmlPullParser parser, Bitmap wall, Bitmap box, Bitmap robot){
 		this.parser = parser;
@@ -45,75 +49,117 @@ public class GameDrawMap {
 	public void parseXmlFile() throws XmlPullParserException, IOException{
 		while(parser.getEventType()!=XmlPullParser.END_DOCUMENT){
 			if(parser.getEventType()==XmlPullParser.START_TAG && parser.getName().equals("point")){
-				xWallCoordinates.add(Integer.parseInt(parser.getAttributeValue(0)));
-				yWallCoordinates.add(Integer.parseInt(parser.getAttributeValue(1)));
+				setCoordinates(parser, 1);
 			}
 			
-			if(parser.getEventType()==XmlPullParser.START_TAG && parser.getName().equals("box")){
-				xBoxCoordinates.add(Integer.parseInt(parser.getAttributeValue(0)));
-				yBoxCoordinates.add(Integer.parseInt(parser.getAttributeValue(1)));
+			if(parser.getEventType()==XmlPullParser.START_TAG && parser.getName().equals("box")){				
+				setCoordinates(parser, 2);
 			}
 			
 			if(parser.getEventType()==XmlPullParser.START_TAG && parser.getName().equals("robot")){
-				xRobotCoordinates.add(Integer.parseInt(parser.getAttributeValue(0)));
-				yRobotCoordinates.add(Integer.parseInt(parser.getAttributeValue(1)));
+				setCoordinates(parser, 3);
+			}
+			
+			if(parser.getEventType()==XmlPullParser.START_TAG && parser.getName().equals("door")){
+				setCoordinates(parser, 4);
 			}
 			
 			parser.next();
 		}
 		
-		for(int i=0; i<xRobotCoordinates.size(); i++){
+		for(int i=0; i<robotCoordinates.size(); i++){
 			Sprite s = new Sprite(gameView, robot);
-			s.setPosition(xRobotCoordinates.get(i), yRobotCoordinates.get(i));
+			s.setPosition(robotCoordinates.get(i).getX(), robotCoordinates.get(i).getY());
 			sprites.add(s);
 		}
 	}
 	
+	private void setCoordinates(XmlPullParser parser, int tag){
+		
+		int x = Integer.parseInt(parser.getAttributeValue(0));
+		int y = Integer.parseInt(parser.getAttributeValue(1));
+		
+		Point p = new Point(x, y);
+		
+		switch (tag) {
+		case 1:
+			wallCoordinates.add(p);
+			break;
+			
+		case 2:
+			boxCoordinates.add(p);
+			break;
+			
+		case 3:
+			robotCoordinates.add(p);
+			break;
+			
+		case 4:
+			exitCoordinate = p;
+			break;
+
+		default:
+			break;
+		}
+	}
+	
 	public void onDraw(Canvas canvas){		
-		for(int i=0; i<xWallCoordinates.size()-1; i++){
-			int x2 = xWallCoordinates.get(i+1);
-			int y2 = yWallCoordinates.get(i+1);
+		for(int i=0; i<wallCoordinates.size()-1; i++){
+			int x2 = wallCoordinates.get(i+1).getX();
+			int y2 = wallCoordinates.get(i+1).getY();
 			int max, j;
 			boolean curCoord;
-			if(xWallCoordinates.get(i)==x2){
+			if(wallCoordinates.get(i).getX()==x2){
 				curCoord = true;
-				if(yWallCoordinates.get(i+1)<yWallCoordinates.get(i)){
-					j = yWallCoordinates.get(i+1);
-					max = yWallCoordinates.get(i);
+				if(wallCoordinates.get(i+1).getY()<wallCoordinates.get(i).getY()){
+					j = wallCoordinates.get(i+1).getY();
+					max = wallCoordinates.get(i).getY();
 				}
 				else{
 					max = y2;
-					j = yWallCoordinates.get(i);
+					j = wallCoordinates.get(i).getY();
 				}
 			}
 			else{
 				curCoord = false;
-				if(xWallCoordinates.get(i+1)<xWallCoordinates.get(i)){
-					j = xWallCoordinates.get(i+1);
-					max = xWallCoordinates.get(i);
+				if(wallCoordinates.get(i+1).getX()<wallCoordinates.get(i).getX()){
+					j = wallCoordinates.get(i+1).getX();
+					max = wallCoordinates.get(i).getX();
 				}
 				else{
 					max = x2;
-					j = xWallCoordinates.get(i);
+					j = wallCoordinates.get(i).getX();
 				}
 			}
 			for(; j<=max; j+=25){
 				if(curCoord){
-					canvas.drawBitmap(wall, xWallCoordinates.get(i), j, null);
+					canvas.drawBitmap(wall, wallCoordinates.get(i).getX(), j, null);
+					gameFieldCoordinates.add(new Point(wallCoordinates.get(i).getX(), j));
 				}
 				else{
-					canvas.drawBitmap(wall, j, yWallCoordinates.get(i), null);
+					canvas.drawBitmap(wall, j, wallCoordinates.get(i).getY(), null);
+					gameFieldCoordinates.add(new Point(j, wallCoordinates.get(i).getY()));
 				}
 			}
 		}
 		
-		for(int i=0; i<xBoxCoordinates.size(); i++){
-			canvas.drawBitmap(box, xBoxCoordinates.get(i), yBoxCoordinates.get(i), null);
+		for(int i=0; i<boxCoordinates.size(); i++){
+			canvas.drawBitmap(box, boxCoordinates.get(i).getX(), boxCoordinates.get(i).getY(), null);
 		}
+		
+		gameFieldCoordinates.add(exitCoordinate);
 
 	}
 	
 	public ArrayList<Sprite> getSprites(){
 		return sprites;
+	}
+	
+	public ArrayList<Point> getBoxCoordinates(){
+		return boxCoordinates;
+	}
+	
+	public ArrayList<Point> getGameFieldCoordinates(){
+		return gameFieldCoordinates;
 	}
 }

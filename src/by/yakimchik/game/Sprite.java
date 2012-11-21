@@ -1,5 +1,7 @@
 package by.yakimchik.game;
 
+import java.util.ArrayList;
+
 import by.yakimchik.data.Coordinates;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -46,6 +48,11 @@ public class Sprite {
 	            }
 	     }
 	     x = x + xSpeed;
+	}
+	
+	private void searchBox(){
+		gameView.gameMap.getGameFieldCoordinates();
+		
 	}
 	
 	public synchronized void onDraw(Canvas canvas){
