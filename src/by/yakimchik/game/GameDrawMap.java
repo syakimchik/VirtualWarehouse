@@ -33,7 +33,7 @@ public class GameDrawMap {
 	
 	private Point exitCoordinate = null;
 	
-	private ArrayList<Sprite> sprites = new ArrayList<Sprite>();
+	private ArrayList<Robot> robots = new ArrayList<Robot>();
 	
 	//game 	field coordinates
 	private ArrayList<Point> gameFieldCoordinates = new ArrayList<Point>();
@@ -68,9 +68,9 @@ public class GameDrawMap {
 		}
 		
 		for(int i=0; i<robotCoordinates.size(); i++){
-			Sprite s = new Sprite(gameView, robot);
+			Robot s = new Robot(gameView, robot);
 			s.setPosition(robotCoordinates.get(i).getX(), robotCoordinates.get(i).getY());
-			sprites.add(s);
+			robots.add(s);
 		}
 	}
 	
@@ -151,8 +151,8 @@ public class GameDrawMap {
 
 	}
 	
-	public ArrayList<Sprite> getSprites(){
-		return sprites;
+	public ArrayList<Robot> getSprites(){
+		return robots;
 	}
 	
 	public ArrayList<Point> getBoxCoordinates(){

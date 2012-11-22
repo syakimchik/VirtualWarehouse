@@ -31,7 +31,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 	
 	private Canvas canvas;
 	
-	private List<Sprite> sprites = new ArrayList<Sprite>();
+	private List<Robot> robots = new ArrayList<Robot>();
 
 	public GameView(Context context) {
 		super(context);
@@ -66,7 +66,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 			e.printStackTrace();
 		}
 		
-		sprites = gameMap.getSprites();
+		robots = gameMap.getSprites();
 		
 		gameLoopThread.setRunning(true);
 		gameLoopThread.start();
@@ -84,7 +84,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 		
 		gameMap.onDraw(canvas);
 		
-		for(Sprite _sprite: sprites){
+		for(Robot _sprite: robots){
 			_sprite.onDraw(canvas);
 		}
 		
